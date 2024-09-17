@@ -2,7 +2,9 @@
   "name": "hono",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts"
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx migrate.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.5",
@@ -11,7 +13,10 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240909.0",
+    "dotenv": "^16.4.5",
     "drizzle-kit": "^0.24.2",
+    "postgres": "^3.4.4",
+    "tsx": "^4.19.1",
     "wrangler": "^3.57.2"
   }
 }

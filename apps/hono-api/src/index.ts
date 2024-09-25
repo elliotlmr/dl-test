@@ -2,11 +2,12 @@ import { Hono } from "hono";
 import { users } from "./schemas/users";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import auth from "./routes/auth";
-import friends from "./routes/friends";
+import authRoutes from "./routes/auth";
+import friendsRoutes from "./routes/friends";
+import usersRoutes from "./routes/users";
 import { csrf } from "hono/csrf";
 import { jwt } from "hono/jwt";
-import { isConnected } from "./middlewares/auth";
+import { isAuthenticated } from "./middlewares/auth";
 
 // const database_url = process.env.DATABASE_URL!;
 
@@ -16,10 +17,13 @@ import { isConnected } from "./middlewares/auth";
 export interface Env {
   DATABASE_URL: string;
   JWT_SECRET: string;
+  JWT_EXPIRES_IN: string;
+  ENVIRONMENT: string;
 }
 
 const app = new Hono<{ Bindings: Env }>();
 
+//? Global setup
 app.use(csrf({ origin: ["localhost:3000"] }));
 
 app.notFound((c) => {
@@ -32,43 +36,15 @@ app.onError((err, c) => {
 });
 
 app.get("/", async (c) => {
-  try {
-    const sql = neon(c.env.DATABASE_URL);
-    const db = drizzle(sql);
-    const result = await db.select().from(users);
-    return c.json({
-      result,
-    });
-  } catch (error) {
-    console.log(error);
-    return c.json(
-      {
-        error,
-      },
-      400
-    );
-  }
-  return c.text("Hello Hono!");
+  return c.text("Welcome to Hono + Drizzle + Neon App ! API coding :D");
 });
 
-app.get("/test", (c) => {
-  return c.text("Hello Hono Test !");
-});
+//? Routes / middlewares
+app.route("/auth", authRoutes);
 
-app.get("/test/:name", (c) => {
-  const name = c.req.param("name");
-  return c.text(`Hello Hono Test ! ${name}`);
-});
+app.use("/api/*", (c, next) => isAuthenticated(c, next));
 
-app.get("/name/:name/comment/:comment", (c) => {
-  const { name, comment } = c.req.param();
-  return c.text(`Hello Hono Test ! ${name} ${comment}`);
-});
-
-app.route("/auth", auth);
-
-app.use("/api/*", (c, next) => isConnected(c, next));
-
-app.route("/api/friends", friends);
+app.route("/api/friends", friendsRoutes);
+app.route("/api/users", usersRoutes);
 
 export default app;

@@ -11,6 +11,7 @@ export const users = pgTable("users", {
   password: varchar("password", { length: 255 }).notNull(),
   friends: text("friends").array().notNull().default([]),
   blacklist: text("blacklist").array().notNull().default([]),
+  role: text("role").notNull().default("guest"),
 });
 
 export const friendRequests = pgTable("friend_requests", {

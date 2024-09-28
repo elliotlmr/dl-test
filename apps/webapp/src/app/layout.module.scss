@@ -1,0 +1,33 @@
+.navigation {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 320px;
+    border-right: 1px solid var(--gold-400);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 4px;
+
+    .title {
+        font-size: 1.5rem;
+        width: 100%;
+        padding: 4px;
+    }
+}
+
+.wrapper {
+    width: 100%;
+    padding: 0 328px;
+
+    .container {
+        height: 100%;
+        width: 100%;
+        max-width: 1240px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+    }
+}

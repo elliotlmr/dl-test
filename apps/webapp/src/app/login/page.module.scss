@@ -1,0 +1,50 @@
+.page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100vw;
+
+    .card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+        width: 320px;
+
+        div {
+            margin: 12px 0 0;
+        }
+    }
+
+    button {
+        transition: background-color .2s ease-in-out;
+        height: 48px;
+        width: 100%;
+        max-width: 420px;
+        background-color: var(--gold-300);
+        border: 1px solid var(--grey-100);
+        border-radius: 4px;
+        margin: 32px 0 0;
+        cursor: pointer;
+        font-size: 1.2rem;
+        font-weight: 600;
+
+        &:hover {
+            background-color: var(--gold-200);
+        }
+    }
+
+    .switch {
+        margin: 32px 0 0;
+        font-size: 1rem;
+        font-weight: 500;
+
+        span {
+            color: var(--gold-200);
+            cursor: pointer;
+        }
+    }
+}

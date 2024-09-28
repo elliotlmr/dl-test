@@ -1,35 +1,33 @@
-import { Hono } from "hono";
-import { users } from "../schemas/users";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { Env } from "..";
-import { bearerAuth } from "hono/bearer-auth";
-import { deleteCookie, setCookie } from "hono/cookie";
-import { eq } from "drizzle-orm";
+import { Hono } from 'hono';
+import { users } from '../schemas/users';
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { Env } from '..';
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
+import { and, eq } from 'drizzle-orm';
+import { User } from '@repo/types/users';
 
 const auth = new Hono<{ Bindings: Env }>();
 
-auth.post("/register", async (c) => {
+auth.post('/register', async (c) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
-  const { email, password, admin } = await c.req.json();
+  const { username, email, password, admin } = await c.req.json();
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    console.log(email, password, admin);
     const newUser = await db
       .insert(users)
       .values({
+        username,
         email,
         password: hashedPassword,
-        role: admin === true ? "admin" : "guest",
+        role: admin === true ? 'admin' : 'guest',
       })
       .returning({ id: users.id, role: users.role });
-
-    console.log("User created !", newUser[0]);
 
     // Generate JWT
     const token = jwt.sign(
@@ -40,26 +38,25 @@ auth.post("/register", async (c) => {
       }
     );
 
-    console.log("Token generated !", token);
-
-    setCookie(c, "who-s-the-good-doge", token, {
+    setCookie(c, 'who-s-the-good-doge', token, {
       httpOnly: true,
-      secure: c.env.ENVIRONMENT === "development" ? false : true,
-      sameSite: "None",
+      secure: c.env.ENVIRONMENT === 'development' ? false : true,
+      sameSite: 'None',
     });
 
-    console.log("User logged !");
-
-    return c.json({ message: "User registered successfully" }, 201);
+    return c.json(
+      { message: 'User registered successfully', user: newUser[0] },
+      201
+    );
   } catch (error) {
     return c.json(
-      { error: "User already exists or error occurred", message: error },
+      { error: 'User already exists or error occurred', message: error },
       400
     );
   }
 });
 
-auth.post("/login", async (c) => {
+auth.post('/login', async (c) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
   const { email, password } = await c.req.json();
@@ -72,14 +69,14 @@ auth.post("/login", async (c) => {
     .limit(1);
 
   if (user.length === 0) {
-    return c.json({ error: "Invalid email or password" }, 400);
+    return c.json({ error: 'Invalid email or password' }, 400);
   }
 
   // Check password
   const validPassword = await bcrypt.compare(password, user[0].password);
 
   if (!validPassword) {
-    return c.json({ error: "Invalid email or password" }, 400);
+    return c.json({ error: 'Invalid email or password' }, 400);
   }
 
   // Generate JWT
@@ -91,18 +88,49 @@ auth.post("/login", async (c) => {
     }
   );
 
-  setCookie(c, "who-s-the-good-doge", token, {
+  setCookie(c, 'who-s-the-good-doge', token, {
     httpOnly: true,
     secure: true,
-    sameSite: "None",
+    sameSite: 'None',
   });
 
-  return c.json({ message: `User authenticated !` });
+  //? Recreate a new object without password for the response
+  const { password: filtered, ...safeUser } = user[0];
+
+  return c.json({ message: `User authenticated !`, user: safeUser });
 });
 
-auth.post("/logout", (c) => {
-  deleteCookie(c, "who-s-the-good-doge");
-  return c.json({ message: "User disconnected" });
+auth.post('/loginWithCookie', async (c) => {
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
+
+  const token = getCookie(c, 'who-s-the-good-doge');
+
+  if (!token) {
+    return c.json({ error: 'No token found !' }, 401);
+  }
+
+  const decoded = jwt.verify(token, c.env.JWT_SECRET) as User;
+  // Find user by email
+  const user = await db
+    .select()
+    .from(users)
+    .where(and(eq(users.id, decoded.id), eq(users.email, decoded.email)))
+    .limit(1);
+
+  if (user.length === 0) {
+    return c.json({ error: 'Invalid token' }, 401);
+  }
+
+  //? Recreate a new object without password for the response
+  const { password: filtered, ...safeUser } = user[0];
+
+  return c.json({ message: `User authenticated !`, user: safeUser });
+});
+
+auth.post('/logout', (c) => {
+  deleteCookie(c, 'who-s-the-good-doge');
+  return c.json({ message: 'User disconnected' });
 });
 
 export default auth;

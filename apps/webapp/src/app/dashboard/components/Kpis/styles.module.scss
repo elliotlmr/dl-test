@@ -1,0 +1,31 @@
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .kpi {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 24px 0 0;
+
+        .data {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .legend {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .separator {
+            margin: 24px 0 0;
+            width: 148px;
+            height: 2px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--gold-400), rgba(255, 255, 255, 0));
+        }
+    }
+}

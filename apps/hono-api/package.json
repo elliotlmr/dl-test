@@ -1,5 +1,5 @@
 {
-  "name": "hono",
+  "name": "hono-api",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts",
@@ -14,6 +14,7 @@
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "@repo/types": "workspace:*",
     "@cloudflare/workers-types": "^4.20240909.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",

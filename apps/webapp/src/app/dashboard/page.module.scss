@@ -1,0 +1,16 @@
+.howto {
+    margin: auto 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    width: 100%;
+    text-align: center;
+
+    span {
+        color: var(--gold-300);
+        cursor: pointer;
+
+        &:hover {
+            color: var(--gold-200);
+        }
+    }
+}

@@ -55,11 +55,15 @@ const Add = () => {
         fullwidth
       />
       <div className={styles.list}>
-        {isLoading ? (
-          <div className={styles.loader} />
-        ) : results.length === 0 ? (
+        {isLoading && <div className={styles.loader} />}{' '}
+        {!isLoading && results.length === 0 && query.length === 0 && (
           <p>You can search friends by typing in the input above :)</p>
-        ) : (
+        )}
+        {!isLoading && results.length === 0 && query.length > 0 && (
+          <p>No doge with this username :(</p>
+        )}
+        {!isLoading &&
+          results.length > 0 &&
           results.map((user, i) => {
             return (
               <FriendButton
@@ -72,8 +76,7 @@ const Add = () => {
                 }}
               />
             );
-          })
-        )}
+          })}
       </div>
     </div>
   );

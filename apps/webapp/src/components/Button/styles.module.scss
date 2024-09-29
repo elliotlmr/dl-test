@@ -52,4 +52,13 @@
     &.full {
         width: 100%;
     }
+
+    &.outlined-grey {
+        border: 2px solid var(--grey-400);
+        background-color: rgba($color: #000000, $alpha: 0);
+
+        &:hover {
+            background-color: var(--grey-400);
+        }
+    }
 }

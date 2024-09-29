@@ -3,7 +3,7 @@
 import { useContext, createContext, useState, useEffect } from 'react';
 import { User } from '@repo/types/users';
 import api from './api';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 type AuthContextType = {
   user: User | null;
@@ -39,7 +39,7 @@ const AuthProvider = ({ children }: Props) => {
     if (!username || !email || !password) {
       throw new Error('Missing username, email or password !');
     }
-    api
+    await api
       .post('/auth/register', {
         username,
         email,
@@ -58,13 +58,13 @@ const AuthProvider = ({ children }: Props) => {
     if (!email || !password) {
       throw new Error('Missing email or password !');
     }
-    api
+    await api
       .post('/auth/login', {
         email,
         password,
       })
       .then((res) => {
-        console.log(res);
+        console.log('NORMAL LOGIN', res);
         setUser(res.data.user);
       })
       .catch((err) => {
@@ -73,7 +73,7 @@ const AuthProvider = ({ children }: Props) => {
   };
 
   const loginWithCookie = async () => {
-    api
+    await api
       .post('/auth/loginWithCookie')
       .then((res) => {
         console.log('Login with cookie success', res);
@@ -88,11 +88,10 @@ const AuthProvider = ({ children }: Props) => {
   };
 
   const logout = async () => {
-    api
+    await api
       .post('/auth/logout')
       .then((res) => {
         console.log(res);
-        redirect('/login');
       })
       .catch((err) => {
         console.log(err);

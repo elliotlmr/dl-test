@@ -41,7 +41,7 @@ auth.post('/register', async (c) => {
     setCookie(c, 'who-s-the-good-doge', token, {
       httpOnly: true,
       secure: c.env.ENVIRONMENT === 'development' ? false : true,
-      sameSite: 'None',
+      sameSite: c.env.ENVIRONMENT === 'development' ? 'Lax' : 'None',
     });
 
     return c.json(
@@ -61,43 +61,48 @@ auth.post('/login', async (c) => {
   const db = drizzle(sql);
   const { email, password } = await c.req.json();
 
-  // Find user by email
-  const user = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
+  try {
+    // Find user by email
+    const user = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
-  if (user.length === 0) {
-    return c.json({ error: 'Invalid email or password' }, 400);
-  }
-
-  // Check password
-  const validPassword = await bcrypt.compare(password, user[0].password);
-
-  if (!validPassword) {
-    return c.json({ error: 'Invalid email or password' }, 400);
-  }
-
-  // Generate JWT
-  const token = jwt.sign(
-    { id: user[0].id, email: email, role: user[0].role },
-    c.env.JWT_SECRET,
-    {
-      expiresIn: c.env.JWT_EXPIRES_IN,
+    if (user.length === 0) {
+      return c.json({ error: 'Invalid email or password' }, 400);
     }
-  );
 
-  setCookie(c, 'who-s-the-good-doge', token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'None',
-  });
+    // Check password
+    const validPassword = await bcrypt.compare(password, user[0].password);
 
-  //? Recreate a new object without password for the response
-  const { password: filtered, ...safeUser } = user[0];
+    if (!validPassword) {
+      return c.json({ error: 'Invalid email or password' }, 400);
+    }
 
-  return c.json({ message: `User authenticated !`, user: safeUser });
+    // Generate JWT
+    const token = jwt.sign(
+      { id: user[0].id, email: email, role: user[0].role },
+      c.env.JWT_SECRET,
+      {
+        expiresIn: c.env.JWT_EXPIRES_IN,
+      }
+    );
+
+    setCookie(c, 'who-s-the-good-doge', token, {
+      httpOnly: true,
+      secure: c.env.ENVIRONMENT === 'development' ? false : true,
+      sameSite: c.env.ENVIRONMENT === 'development' ? 'Lax' : 'None',
+    });
+
+    //? Recreate a new object without password for the response
+    const { password: filtered, ...safeUser } = user[0];
+
+    return c.json({ user: safeUser }, 200);
+  } catch (err) {
+    console.error('Login error:', err);
+    return c.json({ error: 'An error occured during login' }, 500);
+  }
 });
 
 auth.post('/loginWithCookie', async (c) => {

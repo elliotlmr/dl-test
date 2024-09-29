@@ -1,0 +1,80 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.container {
+    animation: fadeIn .2s ease-in-out both;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    margin: 8px 0 0;
+
+    .user {
+        width: 100%;
+        min-height: 48px;
+        padding: 8px;
+        background-color: rgba(89, 87, 87, 0.5019607843);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+
+        .name {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .status {
+            font-size: 1rem;
+            color: var(--grey-300);
+        }
+    }
+
+    .refuse,
+    .accept {
+        transition: max-width .1s ease-in-out;
+        width: 64px;
+        max-width: 0;
+        height: 48px;
+        background-color: var(--red-300);
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        cursor: pointer;
+
+        svg {
+            height: 32px;
+            width: 32px;
+        }
+    }
+
+    .refuse {
+        background-color: var(--red-300);
+    }
+
+    .accept {
+        background-color: var(--green-300);
+    }
+
+    &:hover {
+
+        .refuse,
+        .accept {
+            max-width: 64px;
+        }
+    }
+}

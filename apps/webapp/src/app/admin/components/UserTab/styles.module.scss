@@ -10,29 +10,24 @@
     }
 }
 
-.container {
+.tab {
     animation: fadeIn .2s ease-in-out both;
+    transition: background-color .1s ease-in-out;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
     width: 100%;
+    padding: 8px;
     border-radius: 4px;
-    padding: 8px 16px;
     cursor: pointer;
 
-    &:hover {
-        background-color: var(--grey-400);
-    }
-
-    .img {
-        height: 32px;
-        width: 32px;
+    svg {
+        height: 24px;
+        width: 24px;
         margin: 0 16px 0 0;
     }
 
-    .name {
-        font-size: 1.1rem;
-        font-weight: 500;
+    &:hover {
+        background-color: var(--grey-400);
     }
 }

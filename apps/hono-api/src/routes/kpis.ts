@@ -25,13 +25,14 @@ kpis.get('/average-friends-per-user', async (c) => {
     .select({ friends: usersTable.friends })
     .from(usersTable);
 
-  let total = 0;
+  const totalFriends = users.reduce(
+    (acc, user) => acc + user.friends.length,
+    0
+  );
 
-  for (let user of users) {
-    total += user.friends.length;
-  }
+  let average = totalFriends / users.length;
 
-  let average = total / users.length;
+  console.log('totaaaal', totalFriends, 'averaaage', average, users.length);
 
   return c.json({ average });
 });

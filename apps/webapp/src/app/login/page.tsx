@@ -11,6 +11,7 @@ import { useAuth } from '@/utils/AuthProvider';
 export default function Login() {
   const router = useRouter();
   const auth = useAuth();
+  const [loading, setLoading] = useState<boolean>(false);
   const [display, setDisplay] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState<string>('');
   const [usernameError, setUsernameError] = useState<string | null>(null);
@@ -24,6 +25,10 @@ export default function Login() {
   );
 
   const handleClick = async () => {
+    setLoading(true);
+    if (username.length <= 0) {
+      setUsernameError('Username is required.');
+    }
     if (email.length <= 0) {
       setEmailError('Email is required.');
     }
@@ -35,23 +40,38 @@ export default function Login() {
     }
 
     if (
-      (display === 'register' && usernameError) ||
-      emailError ||
-      passwordError ||
-      (display === 'register' && confirmationError)
+      (display === 'register' && username.length <= 0) ||
+      email.length <= 0 ||
+      password.length <= 0 ||
+      (display === 'register' && confirmation.length <= 0)
     ) {
+      setLoading(false);
       return;
     }
 
     if (display === 'login') {
-      auth.login(email, password).then(() => {
-        router.push('/dashboard');
-      });
+      await auth
+        .login(email, password)
+        .then(() => {
+          console.log('Login success !');
+          setLoading(false);
+          router.push('/dashboard');
+        })
+        .catch((err) => {
+          console.log('Error login !', err);
+        });
     }
     if (display === 'register') {
-      auth.register(username, email, password).then(() => {
-        router.push('/dashboard');
-      });
+      await auth
+        .register(username, email, password)
+        .then(() => {
+          console.log('Register success !');
+          setLoading(false);
+          router.push('/dashboard');
+        })
+        .catch((err) => {
+          console.log('Error signing up !', err);
+        });
     }
   };
 
@@ -135,7 +155,13 @@ export default function Login() {
           />
         )}
         <button type='submit' onClick={handleClick}>
-          {display === 'login' ? 'Sign In' : 'Sign Up'}
+          {loading ? (
+            <div className={styles.loader} />
+          ) : display === 'login' ? (
+            'Sign In'
+          ) : (
+            'Sign Up'
+          )}
         </button>
       </form>
       {display === 'register' ? (

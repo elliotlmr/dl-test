@@ -45,9 +45,12 @@ users.get('/', async (c) => {
   const users = await db
     .select({
       id: usersTable.id,
+      username: usersTable.username,
       firstname: usersTable.firstname,
       lastname: usersTable.lastname,
       email: usersTable.email,
+      friends: usersTable.friends,
+      role: usersTable.role,
     })
     .from(usersTable);
 

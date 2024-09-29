@@ -23,7 +23,7 @@ const Profile = ({ user }: Props) => {
   };
 
   return (
-    <div className={styles.profile} onClick={handleProfile}>
+    <div className={styles.profile}>
       <p className={styles.username}>{user.username}</p>
       <div className={styles.id} onClick={(e) => handleClipboard(e)}>
         <p>ID: {user.id}</p>

@@ -59,7 +59,7 @@ const Kpis = () => {
       )}
       {average !== null && (
         <div className={styles.kpi}>
-          <p className={styles.data}>{average}</p>
+          <p className={styles.data}>{average.toFixed()}</p>
           <p className={styles.legend}>friends per user on average</p>
           <div className={styles.separator} />
         </div>

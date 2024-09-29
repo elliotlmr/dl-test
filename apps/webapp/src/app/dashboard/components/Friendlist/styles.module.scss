@@ -10,6 +10,7 @@
     .list {
         width: 100%;
         padding: 0 4px;
+        margin: 0 0 32px;
 
         .dropdown {
             width: 100%;
@@ -32,10 +33,18 @@
             }
 
             svg {
+                transition: transform .2s ease-in-out;
                 margin: 0 0 0 auto;
                 height: 24px;
                 width: 24px;
                 flex-shrink: 0;
+                transform: rotate(0);
+            }
+
+            &.open {
+                svg {
+                    transform: rotate(180deg);
+                }
             }
         }
     }
@@ -43,6 +52,7 @@
     .add {
         transition: all .2s ease-in-out;
         height: 48px;
+        width: 100%;
         padding: 0 8px 0 16px;
         background-color: var(--gold-300);
         border: none;
@@ -52,7 +62,7 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        margin: auto 0;
+        margin: auto 0 8px;
 
         &:hover {
             background-color: var(--gold-200);

@@ -3,11 +3,22 @@ import { drizzle } from 'drizzle-orm/neon-http';
 import { Hono } from 'hono';
 import { Env, Variables } from '..';
 import { friendRequests, users } from '../schemas/users';
-import { and, eq, ilike, like, notInArray, or } from 'drizzle-orm';
+import {
+  aliasedTable,
+  and,
+  eq,
+  getTableColumns,
+  ilike,
+  inArray,
+  like,
+  ne,
+  notInArray,
+  or,
+} from 'drizzle-orm';
 
 const friends = new Hono<{ Variables: Variables; Bindings: Env }>();
 
-//? Get all friends (id)
+//? Get all friends
 friends.get('/', async (c) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
@@ -25,7 +36,14 @@ friends.get('/', async (c) => {
 
   const { friends } = userFriendlist[0];
 
-  return c.json({ friends }, 200);
+  const { password, ...safeData } = getTableColumns(users);
+
+  const friendlist = await db
+    .select({ ...safeData })
+    .from(users)
+    .where(inArray(users.id, friends));
+
+  return c.json({ friendlist }, 200);
 });
 
 //? Get users list from search query (limit 10)
@@ -91,8 +109,9 @@ friends.get('/search', async (c) => {
       .from(users)
       .where(
         and(
-          notInArray(users.id, friendlist),
-          notInArray(users.id, uniqueIds),
+          notInArray(users.id, friendlist), // Not in the friendlist
+          notInArray(users.id, uniqueIds), // Not in the pending requests
+          ne(users.id, user.id), // Not the user itself
           ilike(users.username, `%${query}%`)
         )
       )
@@ -112,6 +131,7 @@ friends.get('/requests', async (c) => {
 
   const user = c.get('user');
 
+  const friends = aliasedTable(users, 'friends');
   // Get the request
   const requests = await db
     .select({
@@ -121,7 +141,8 @@ friends.get('/requests', async (c) => {
       status: friendRequests.status,
       created_at: friendRequests.created_at,
       treated_at: friendRequests.treated_at,
-      friendUsername: users.username,
+      username: users.username,
+      friendUsername: friends.username,
     })
     .from(friendRequests)
     .where(
@@ -136,7 +157,10 @@ friends.get('/requests', async (c) => {
         )
       )
     )
-    .leftJoin(users, eq(friendRequests.friend_id, users.id));
+    .leftJoin(friends, eq(friendRequests.friend_id, friends.id))
+    .rightJoin(users, eq(friendRequests.user_id, users.id));
+
+  console.log(requests);
 
   if (requests.length === 0) {
     return c.json({ error: 'No request found :(' });
@@ -243,6 +267,41 @@ friends.post('/accept/:requestId', async (c) => {
   return c.json({ message: 'Doges are now friends :)' }, 200);
 });
 
+//? Accept a friend request
+friends.delete('/refuse/:requestId', async (c) => {
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
+
+  const user = c.get('user');
+
+  const { requestId } = c.req.param();
+
+  // Get the request
+  const request = await db
+    .select()
+    .from(friendRequests)
+    .where(eq(friendRequests.id, requestId));
+
+  if (request.length === 0 || request[0].status !== 'pending') {
+    return c.json({ error: 'Invalid or already processed request' }, 400);
+  }
+
+  const isAuthorized =
+    request[0].friend_id === user.id || request[0].user_id === user.id;
+
+  if (!isAuthorized) {
+    return c.json(
+      { error: 'You are not authorized to delete this friend request' },
+      403
+    );
+  }
+
+  // Delete the friend request
+  await db.delete(friendRequests).where(eq(friendRequests.id, requestId));
+
+  return c.json({ success: 'Friend request deleted' }, 200);
+});
+
 //? Get friend's infos
 friends.get('/:friendId', async (c) => {
   const sql = neon(c.env.DATABASE_URL);
@@ -338,7 +397,7 @@ friends.delete('/:friendId', async (c) => {
   try {
     await db
       .update(users)
-      .set({ friends: newUserFriendlist })
+      .set({ friends: newFriendFriendlist })
       .where(eq(users.id, friendId));
   } catch (err) {
     console.log(err);

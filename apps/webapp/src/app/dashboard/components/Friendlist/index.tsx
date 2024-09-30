@@ -13,8 +13,8 @@ const Friendlist = () => {
   const router = useRouter();
   const { friends, pendingRequests, getAllFriends, getPendingRequests } =
     useFriends();
-  const [openRequests, setOpenRequest] = useState<boolean>(false);
-  const [openFriendlist, setOpenFriendlist] = useState<boolean>(false);
+  const [openRequests, setOpenRequest] = useState<boolean>(true);
+  const [openFriendlist, setOpenFriendlist] = useState<boolean>(true);
 
   useEffect(() => {
     if (!friends) {

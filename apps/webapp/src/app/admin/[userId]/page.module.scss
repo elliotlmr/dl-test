@@ -1,16 +1,48 @@
-.howto {
-    margin: auto 0;
-    font-size: 1.2rem;
-    font-weight: 500;
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 32px 24px;
     width: 100%;
-    text-align: center;
+    flex: 1;
+    height: 100vh;
+    height: 100dvh;
 
-    span {
-        color: var(--gold-300);
-        cursor: pointer;
+    .header {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+        width: 100%;
 
-        &:hover {
-            color: var(--gold-200);
+        .img {
+            height: 92px;
+            width: 92px;
+            border-radius: 100px;
+            border: 1px solid var(--gold-400);
+            object-fit: cover;
+            margin: 0 32px 0 0;
         }
+    }
+
+    .loader {
+        height: 48px;
+        width: 48px;
+        border-radius: 24px;
+        border: 2px solid var(--gold-400);
+        border-bottom: none;
+        animation: rotate .4s ease-in-out both infinite;
+        margin: auto 0;
     }
 }

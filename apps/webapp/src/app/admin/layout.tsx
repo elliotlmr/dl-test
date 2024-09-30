@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useFriends } from '@/utils/FriendsProvider';
 import Logout from '@/assets/vectors/logout.svg';
 import Dashboard from '@/assets/vectors/dashboard.svg';
+import Add from '@/assets/vectors/add.svg';
 import Profile from '../dashboard/components/Profile';
 import UsersList from './components/UsersList';
 
@@ -39,6 +40,14 @@ const AdminLayout = ({ children }: Props) => {
           <p className={styles.title}>DOGEMASTER</p>
         </div>
         <UsersList />
+        <Button
+          onClick={() => router.push('/admin/create')}
+          fullWidth
+          custom={{ margin: '0 0 8px' }}
+        >
+          <p>Create user</p>
+          <Add />
+        </Button>
         {user && <Profile user={user} />}
         {user?.role === 'admin' && (
           <Button

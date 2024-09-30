@@ -3,6 +3,7 @@
 import { useContext, createContext, useState } from 'react';
 import { User } from '@repo/types/users';
 import api from './api';
+import { AxiosResponse } from 'axios';
 
 type AdminContextType = {
   users: User[] | null;
@@ -11,20 +12,32 @@ type AdminContextType = {
     username: string,
     email: string,
     password: string
-  ) => Promise<void>;
-  addFriendToUser: (userId: string, friendId: string) => Promise<void>;
-  removeFriendFromUser: (userId: string, friendId: string) => Promise<void>;
-  getFriendsOfUser: (userId: string) => Promise<void>;
+  ) => Promise<AxiosResponse<any>>;
+  addFriendToUser: (
+    userId: string,
+    friendId: string
+  ) => Promise<AxiosResponse<any>>;
+  removeFriendFromUser: (
+    userId: string,
+    friendId: string
+  ) => Promise<AxiosResponse<any>>;
+  getFriendsOfUser: (userId: string) => Promise<User[]>;
   refreshAdminProvider: () => void;
 };
 
 const AdminContext = createContext<AdminContextType>({
   users: null,
   getAllUsers: async () => {},
-  createUser: async () => Promise.resolve(),
-  addFriendToUser: async () => Promise.resolve(),
-  removeFriendFromUser: async () => Promise.resolve(),
-  getFriendsOfUser: async () => Promise.resolve(),
+  createUser: async () => {
+    return Promise.resolve({ data: {} } as AxiosResponse);
+  },
+  addFriendToUser: async () => {
+    return Promise.resolve({ data: {} } as AxiosResponse);
+  },
+  removeFriendFromUser: async () => {
+    return Promise.resolve({ data: {} } as AxiosResponse);
+  },
+  getFriendsOfUser: async () => [],
   refreshAdminProvider: () => {},
 });
 
@@ -55,7 +68,7 @@ const AdminProvider = ({ children }: Props) => {
     if (!username || !email || !password) {
       throw new Error('Missing username, email or password !');
     }
-    await api
+    return await api
       .post('/api/users', {
         username,
         email,
@@ -64,43 +77,46 @@ const AdminProvider = ({ children }: Props) => {
       .then((res) => {
         console.log(res);
         getAllUsers();
+        return res;
       })
       .catch((err) => {
         console.log(err);
+        throw err;
       });
   };
 
   const addFriendToUser = async (userId: string, friendId: string) => {
-    await api
+    return await api
       .post(`/api/users/${userId}/friends/${friendId}`)
       .then((res) => {
-        console.log(res.data.message);
+        return res;
       })
       .catch((err) => {
-        console.log(err);
+        throw err;
       });
   };
 
   const removeFriendFromUser = async (userId: string, friendId: string) => {
-    await api
+    return await api
       .delete(`/api/users/${userId}/friends/${friendId}`)
       .then((res) => {
-        console.log(res.data.message);
+        return res;
       })
       .catch((err) => {
-        console.log(err);
+        throw err;
       });
   };
 
-  const getFriendsOfUser = async (userId: string) => {
-    await api
+  const getFriendsOfUser = async (userId: string): Promise<User[]> => {
+    return await api
       .get(`/api/users/${userId}/friends`)
       .then((res) => {
         console.log(res);
-        return res.data.friends;
+        return res.data.friendlist;
       })
       .catch((err) => {
         console.log(err);
+        return [];
       });
   };
 

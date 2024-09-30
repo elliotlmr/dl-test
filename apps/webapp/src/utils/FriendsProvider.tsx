@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext, createContext, useState } from 'react';
-import { FriendRequest, User } from '@repo/types/users';
+import { FriendRequest, User } from '@/types/users';
 import { useRouter } from 'next/navigation';
 import api from './api';
 

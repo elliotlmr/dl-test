@@ -1,6 +1,6 @@
 'use client';
 
-import { User } from '@repo/types/users';
+import { User } from '@/types/users';
 import styles from './styles.module.scss';
 import { useAdmin } from '@/utils/AdminProvider';
 import { useEffect, useState } from 'react';

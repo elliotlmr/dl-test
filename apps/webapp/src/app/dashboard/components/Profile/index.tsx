@@ -1,6 +1,6 @@
 'use client';
 
-import { User } from '@repo/types/users';
+import { User } from '@/types/users';
 import Copy from '@/assets/vectors/copy.svg';
 import styles from './styles.module.scss';
 import { useRouter } from 'next/navigation';

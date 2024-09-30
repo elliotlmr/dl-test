@@ -3,7 +3,7 @@
 import api from '@/utils/api';
 import styles from './styles.module.scss';
 import { useEffect, useState } from 'react';
-import { User } from '@repo/types/users';
+import { User } from '@/types/users';
 import { useRouter } from 'next/navigation';
 
 type Props = {

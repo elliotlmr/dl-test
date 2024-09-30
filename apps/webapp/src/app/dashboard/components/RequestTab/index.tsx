@@ -3,7 +3,7 @@
 import api from '@/utils/api';
 import styles from './styles.module.scss';
 import { useEffect, useState } from 'react';
-import { FriendRequest, User } from '@repo/types/users';
+import { FriendRequest, User } from '@/types/users';
 import Add from '@/assets/vectors/check.svg';
 import Close from '@/assets/vectors/close.svg';
 import { useFriends } from '@/utils/FriendsProvider';

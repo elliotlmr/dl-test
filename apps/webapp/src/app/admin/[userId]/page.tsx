@@ -1,11 +1,19 @@
-'use client';
-
 import { useAdmin } from '@/utils/AdminProvider';
 import styles from './page.module.scss';
 import Credentials from './components/Credentials';
 import Friendlist from './components/Friendlist';
+import { User } from '@/types/users';
+import api from '@/utils/api';
 
 type Props = { params: { userId: string } };
+
+export async function generateStaticParams() {
+  const res = await api.get('/api/users');
+
+  return res.data.users.map((user: User) => ({
+    userId: user.id,
+  }));
+}
 
 const UserProfile = ({ params }: Props) => {
   const { users } = useAdmin();

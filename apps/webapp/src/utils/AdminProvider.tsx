@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext, createContext, useState } from 'react';
-import { User } from '@repo/types/users';
+import { User } from '@/types/users';
 import api from './api';
 import { AxiosResponse } from 'axios';
 

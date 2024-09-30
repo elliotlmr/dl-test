@@ -17,7 +17,6 @@ const UsersList = () => {
       <p className={styles.title}>Users list :</p>
       <div className={styles.list}>
         {users?.map((user, i) => {
-          console.log(user);
           return <UserTab user={user} key={i} index={i} />;
         })}
       </div>

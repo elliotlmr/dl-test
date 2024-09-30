@@ -5,7 +5,7 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { users as usersTable } from '../schemas/users';
 import bcrypt from 'bcryptjs';
-import { eq } from 'drizzle-orm';
+import { eq, getTableColumns, inArray } from 'drizzle-orm';
 
 const users = new Hono<{ Bindings: Env }>();
 
@@ -34,7 +34,8 @@ users.post('/', async (c) => {
   if (newUser.length === 0) {
     return c.json({ error: 'Error creating user :/' }, 400);
   }
-  return c.json({ message: 'Create a new user !' }, 200);
+
+  return c.json({ message: 'Create a new user !', user: newUser[0] }, 201);
 });
 
 //? Retrieve a list of all users
@@ -62,73 +63,81 @@ users.get('/', async (c) => {
 
 //? Add a friend to a user's friend list
 users.post('/:id/friends/:friendId', async (c) => {
-  const sql = neon(c.env.DATABASE_URL);
-  const db = drizzle(sql);
+  try {
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
 
-  const { id, friendId } = c.req.param();
+    const { id, friendId } = c.req.param();
 
-  const user = await db
-    .select({ id: usersTable.id, friends: usersTable.friends })
-    .from(usersTable)
-    .where(eq(usersTable.id, id));
-
-  if (user.length === 0) {
-    return c.json({ error: 'User account is missing !' }, 400);
-  }
-
-  const friend = await db
-    .select({ id: usersTable.id, friends: usersTable.friends })
-    .from(usersTable)
-    .where(eq(usersTable.id, friendId));
-
-  if (friend.length === 0) {
-    return c.json({ error: 'Friend account is missing !' }, 400);
-  }
-
-  const userKnowsFriend = user[0].friends.find((entry) => entry === friendId);
-  const friendKnowsUser = friend[0].friends.find((entry) => entry === id);
-
-  if (userKnowsFriend && friendKnowsUser) {
-    return c.json({ error: 'These doges already know each other !' }, 400);
-  }
-
-  if (!userKnowsFriend) {
-    let newUserFriendlist = user[0].friends;
-    newUserFriendlist.push(friendId);
-
-    try {
-      await db
-        .update(usersTable)
-        .set({ friends: newUserFriendlist })
-        .where(eq(usersTable.id, id));
-    } catch (err) {
-      console.log(err);
-      return c.json(
-        { error: "Couldn't add friend to user's friendlist !" },
-        400
-      );
+    if (id === friendId) {
+      return c.json({ error: "This doge can't be friend with itself !" }, 400);
     }
-  }
 
-  if (!friendKnowsUser) {
-    let newFriendFriendlist = friend[0].friends;
-    newFriendFriendlist.push(id);
+    const user = await db
+      .select({ id: usersTable.id, friends: usersTable.friends })
+      .from(usersTable)
+      .where(eq(usersTable.id, id));
 
-    try {
-      await db
-        .update(usersTable)
-        .set({ friends: newFriendFriendlist })
-        .where(eq(usersTable.id, friendId));
-    } catch (err) {
-      console.log(err);
-      return c.json(
-        { error: "Couldn't add friend to user's friendlist !" },
-        400
-      );
+    if (user.length === 0) {
+      return c.json({ error: 'User account is missing !' }, 400);
     }
-  }
 
-  return c.json({ message: 'These two doges are now friends <3' }, 200);
+    const friend = await db
+      .select({ id: usersTable.id, friends: usersTable.friends })
+      .from(usersTable)
+      .where(eq(usersTable.id, friendId));
+
+    if (friend.length === 0) {
+      return c.json({ error: 'Friend account is missing !' }, 400);
+    }
+
+    const userKnowsFriend = user[0].friends.find((entry) => entry === friendId);
+    const friendKnowsUser = friend[0].friends.find((entry) => entry === id);
+
+    if (userKnowsFriend && friendKnowsUser) {
+      return c.json({ error: 'These doges already know each other !' }, 400);
+    }
+
+    if (!userKnowsFriend) {
+      let newUserFriendlist = user[0].friends;
+      newUserFriendlist.push(friendId);
+
+      try {
+        await db
+          .update(usersTable)
+          .set({ friends: newUserFriendlist })
+          .where(eq(usersTable.id, id));
+      } catch (err) {
+        console.log(err);
+        return c.json(
+          { error: "Couldn't add friend to user's friendlist !" },
+          400
+        );
+      }
+    }
+
+    if (!friendKnowsUser) {
+      let newFriendFriendlist = friend[0].friends;
+      newFriendFriendlist.push(id);
+
+      try {
+        await db
+          .update(usersTable)
+          .set({ friends: newFriendFriendlist })
+          .where(eq(usersTable.id, friendId));
+      } catch (err) {
+        console.log(err);
+        return c.json(
+          { error: "Couldn't add friend to user's friendlist !" },
+          400
+        );
+      }
+    }
+
+    return c.json({ message: 'These two doges are now friends <3' }, 200);
+  } catch (err) {
+    return c.json({ error: "Couldn't add friend to user's friendlist !" }, 400);
+  }
 });
 
 //? Remove a friend from a user’s friend list
@@ -207,7 +216,14 @@ users.get('/:id/friends', async (c) => {
 
   const userFriendlist = user[0].friends;
 
-  return c.json({ userFriendlist }, 200);
+  const { password, ...safeData } = getTableColumns(usersTable);
+
+  const friendlist = await db
+    .select({ ...safeData })
+    .from(usersTable)
+    .where(inArray(usersTable.id, userFriendlist));
+
+  return c.json({ friendlist }, 200);
 });
 
 export default users;

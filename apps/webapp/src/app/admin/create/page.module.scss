@@ -1,0 +1,42 @@
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100vw;
+
+    .card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+        width: 320px;
+
+        div {
+            margin: 12px 0 0;
+        }
+    }
+
+
+    .loader {
+        height: 24px;
+        width: 24px;
+        border-radius: 16px;
+        border: 2px solid var(--grey-100);
+        border-bottom: none;
+        animation: rotate .4s ease-in-out infinite both;
+        margin: 0;
+    }
+}

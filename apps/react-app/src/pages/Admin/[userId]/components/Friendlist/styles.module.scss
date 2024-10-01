@@ -1,0 +1,128 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.credentials {
+    flex: 1;
+    border-radius: 4px;
+    border: 2px solid var(--gold-400);
+
+    .body {
+
+        .row {
+            background-color: var(--grey-400);
+            cursor: pointer;
+
+            &:nth-child(odd) {
+                background-color: rgba(89, 87, 87, 0.5019607843);
+
+            }
+
+            &:hover {
+                background-color: var(--grey-300);
+            }
+
+            .key,
+            .value {
+                padding: 8px;
+            }
+        }
+    }
+}
+
+.list {
+    width: 100%;
+    padding: 0 4px;
+    margin: 16px 0 32px;
+    flex: 1;
+
+    .handler {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        width: 100%;
+
+        .btn {
+            transition: background-color .1s ease-in-out;
+            height: 56px;
+            width: 92px;
+            margin: 12px 0 0 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+
+            &.add {
+                background-color: var(--green-300);
+
+                &:hover {
+                    background-color: var(--green-200);
+                }
+            }
+
+            &.remove {
+                background-color: var(--red-300);
+
+                &:hover {
+                    background-color: var(--red-200);
+                }
+            }
+        }
+    }
+
+    .dropdown {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        height: 48px;
+        border-radius: 4px;
+        margin: 32px 0 0;
+        padding: 0 8px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--grey-400);
+        }
+
+        p {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        svg {
+            transition: transform .2s ease-in-out;
+            margin: 0 0 0 auto;
+            height: 24px;
+            width: 24px;
+            flex-shrink: 0;
+            transform: rotate(0);
+        }
+
+        &.open {
+            svg {
+                transform: rotate(180deg);
+            }
+        }
+    }
+
+    .friends {
+        margin: 0 0 32px;
+        overflow-y: auto;
+
+        .empty {
+            animation: fadeIn .2s ease-in-out both;
+            width: 100%;
+            text-align: center;
+            margin: 16px 0 0;
+        }
+    }
+}

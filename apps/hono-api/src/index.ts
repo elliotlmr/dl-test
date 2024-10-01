@@ -24,7 +24,11 @@ const app = new Hono<{ Variables: Variables; Bindings: Env }>();
 app.use(
   '/*',
   cors({
-    origin: 'http://localhost:3000',
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'https://dl-test.pages.dev/',
+    ],
     allowMethods: ['POST', 'GET', 'OPTIONS', 'DELETE', 'PUT'],
     credentials: true,
   })

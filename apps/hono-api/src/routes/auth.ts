@@ -40,8 +40,8 @@ auth.post('/register', async (c) => {
 
     setCookie(c, 'who-s-the-good-doge', token, {
       httpOnly: true,
-      secure: c.env.ENVIRONMENT === 'development' ? false : true,
-      sameSite: c.env.ENVIRONMENT === 'development' ? 'Lax' : 'None',
+      secure: c.env.ENVIRONMENT === 'production',
+      sameSite: c.env.ENVIRONMENT === 'production' ? 'None' : 'Lax',
     });
 
     return c.json(
@@ -91,8 +91,8 @@ auth.post('/login', async (c) => {
 
     setCookie(c, 'who-s-the-good-doge', token, {
       httpOnly: true,
-      secure: c.env.ENVIRONMENT === 'development' ? false : true,
-      sameSite: c.env.ENVIRONMENT === 'development' ? 'Lax' : 'None',
+      secure: c.env.ENVIRONMENT === 'production',
+      sameSite: c.env.ENVIRONMENT === 'production' ? 'None' : 'Lax',
     });
 
     //? Recreate a new object without password for the response
@@ -106,36 +106,49 @@ auth.post('/login', async (c) => {
 });
 
 auth.post('/loginWithCookie', async (c) => {
-  const sql = neon(c.env.DATABASE_URL);
-  const db = drizzle(sql);
+  try {
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
 
-  const token = getCookie(c, 'who-s-the-good-doge');
+    const token = getCookie(c, 'who-s-the-good-doge');
 
-  if (!token) {
-    return c.json({ error: 'No token found !' }, 401);
+    if (!token) {
+      return c.json({ error: 'No token found !' }, 401);
+    }
+
+    const decoded = jwt.verify(token, c.env.JWT_SECRET) as User;
+    // Find user by email
+    const user = await db
+      .select()
+      .from(users)
+      .where(and(eq(users.id, decoded.id), eq(users.email, decoded.email)))
+      .limit(1);
+
+    if (user.length === 0) {
+      return c.json({ error: 'Invalid token' }, 401);
+    }
+
+    //? Recreate a new object without password for the response
+    const { password: filtered, ...safeUser } = user[0];
+
+    return c.json({ message: `User authenticated !`, user: safeUser });
+  } catch (err) {
+    c.json({ message: "Couldn't login with cookie", error: err }, 400);
   }
-
-  const decoded = jwt.verify(token, c.env.JWT_SECRET) as User;
-  // Find user by email
-  const user = await db
-    .select()
-    .from(users)
-    .where(and(eq(users.id, decoded.id), eq(users.email, decoded.email)))
-    .limit(1);
-
-  if (user.length === 0) {
-    return c.json({ error: 'Invalid token' }, 401);
-  }
-
-  //? Recreate a new object without password for the response
-  const { password: filtered, ...safeUser } = user[0];
-
-  return c.json({ message: `User authenticated !`, user: safeUser });
 });
 
-auth.post('/logout', (c) => {
-  deleteCookie(c, 'who-s-the-good-doge');
-  return c.json({ message: 'User disconnected' });
+auth.post('/logout', async (c) => {
+  try {
+    deleteCookie(c, 'who-s-the-good-doge', {
+      httpOnly: true,
+      secure: c.env.ENVIRONMENT === 'production',
+      sameSite: c.env.ENVIRONMENT === 'production' ? 'None' : 'Lax',
+    });
+
+    return c.json({ message: 'User disconnected' });
+  } catch (err) {
+    c.json({ message: 'Error disconnecting :(', error: err }, 400);
+  }
 });
 
 export default auth;

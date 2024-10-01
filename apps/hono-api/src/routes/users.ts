@@ -3,9 +3,9 @@ import { Env } from '..';
 import { isAdmin } from '../middlewares/auth';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import { users as usersTable } from '../schemas/users';
+import { friendRequests, users as usersTable } from '../schemas/users';
 import bcrypt from 'bcryptjs';
-import { eq, getTableColumns, inArray } from 'drizzle-orm';
+import { and, eq, getTableColumns, inArray, or } from 'drizzle-orm';
 
 const users = new Hono<{ Bindings: Env }>();
 
@@ -132,6 +132,28 @@ users.post('/:id/friends/:friendId', async (c) => {
           400
         );
       }
+    }
+
+    //? If pending friend request exists, delete it
+    const condition = () =>
+      or(
+        and(
+          eq(friendRequests.user_id, user[0].id),
+          eq(friendRequests.friend_id, friend[0].id)
+        ),
+        and(
+          eq(friendRequests.user_id, friend[0].id),
+          eq(friendRequests.friend_id, user[0].id)
+        )
+      );
+
+    const pendingRequests = await db
+      .select()
+      .from(friendRequests)
+      .where(condition());
+
+    if (pendingRequests.length > 0) {
+      await db.delete(friendRequests).where(condition());
     }
 
     return c.json({ message: 'These two doges are now friends <3' }, 200);

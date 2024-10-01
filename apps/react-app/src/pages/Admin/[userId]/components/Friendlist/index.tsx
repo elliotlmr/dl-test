@@ -7,6 +7,7 @@ import Add from '@/assets/vectors/person-add.svg';
 import Delete from '@/assets/vectors/delete.svg';
 import FriendTab from '../FriendTab';
 import TextInput from '@/components/TextInput';
+import { useFriends } from '@/providers/FriendsProvider';
 
 type Props = {
   userId: string;
@@ -19,17 +20,19 @@ const Friendlist = ({ userId }: Props) => {
   const [friends, setFriends] = useState<User[]>([]);
   const { getFriendsOfUser, addFriendToUser, removeFriendFromUser } =
     useAdmin();
+  const { resetProvider } = useFriends();
 
   const refresh = useCallback(async () => {
     await getFriendsOfUser(userId)
       .then((res) => {
         console.log(res);
         setFriends(res);
+        resetProvider();
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [getFriendsOfUser, userId]);
+  }, [getFriendsOfUser, userId, resetProvider]);
 
   useEffect(() => {
     refresh();

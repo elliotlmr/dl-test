@@ -2,7 +2,7 @@
   "name": "hono-api",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
-    "deploy": "wrangler deploy --minify src/index.ts",
+    "deploy": "wrangler deploy --minify --keep-vars src/index.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx migrate.ts"
   },

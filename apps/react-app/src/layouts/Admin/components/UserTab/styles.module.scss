@@ -1,0 +1,33 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tab {
+    animation: fadeIn .2s ease-in-out both;
+    transition: background-color .1s ease-in-out;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    svg {
+        height: 24px;
+        width: 24px;
+        margin: 0 16px 0 0;
+    }
+
+    &:hover {
+        background-color: var(--grey-400);
+    }
+}

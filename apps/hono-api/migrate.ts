@@ -6,9 +6,11 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 
 config({ path: '.dev.vars' });
 
+const isProd = process.env.ENVIRONMENT === 'production';
+
 const databaseUrl = drizzle(
   postgres(
-    `${process.env.PROD_DATABASE_URL}`,
+    `${isProd ? process.env.PROD_DATABASE_URL : process.env.DATABASE_URL}`,
 
     { ssl: 'require', max: 1 }
   )

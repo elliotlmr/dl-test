@@ -1,13 +1,13 @@
-# Turborepo starter
+# Turborepo DL-Test
 
-This is an official starter Turborepo.
+## Quickstart
 
-## Using this example
+To start local apps ( Hono backend API + React frontend webapp ) :
 
-Run the following command:
+```
+cd dl-test
 
-```sh
-npx create-turbo@latest
+pnpm dev
 ```
 
 ## What's inside?
@@ -16,13 +16,41 @@ This Turborepo includes the following packages/apps:
 
 ### Apps and Packages
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+- `hono-api`: a [Hono.js](https://hono.dev/) app
+- `react-app`: a [Vite / React.js](https://vitejs.dev/) app that allows you to
+
+1. sign in / sign up, have access to a user interface to search/add/remove/check friends.
+2. have access to an admin backoffice to manage users
+
+- `@repo/types`: a types library shared by both `hono-api` and `react-app` applications
 - `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
 - `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+
+### Usefull commands per apps
+
+- `hono-api`
+
+```
+// To start developping ( local )
+dev
+// To deploy on Cloudflare Workers local version
+deploy
+// To generate new .sql file
+db:generate
+// To migrate Neon postgres database from generated .sql file
+db:migrate
+```
+
+- `react-app`
+
+```
+// To start developping ( local )
+dev
+// To build application for production
+build
+```
 
 ### Utilities
 
@@ -32,83 +60,18 @@ This Turborepo has some additional tools already setup for you:
 - [ESLint](https://eslint.org/) for code linting
 - [Prettier](https://prettier.io) for code formatting
 
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
-```
-
 ### Develop
 
 To develop all apps and packages, run the following command:
 
 ```
-cd my-turborepo
+cd dl-test
+
 pnpm dev
 ```
 
-### Remote Caching
+## Potential improvements
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
-
-
-# REMINDER package.json structure
-
-```
-{
-  "name": "web",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@repo/ui": "workspace:*",
-    "next": "14.2.6",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
-  },
-  "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.6",
-    "typescript": "^5"
-  }
-}
-```
+- Add chatrooms between friends (relational table)
+- Add more custom fields on user table (profile picture, description, etc..)
+- Implement blacklist system

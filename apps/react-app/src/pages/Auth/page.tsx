@@ -105,7 +105,6 @@ const Auth = () => {
         }
         break;
       case 'confirmation':
-        console.log(value, password);
         setConfirmation(value);
         if (value !== password) {
           setConfirmationError('Confirmation does not match your password.');

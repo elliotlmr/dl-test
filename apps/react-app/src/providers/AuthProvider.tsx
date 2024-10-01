@@ -44,6 +44,7 @@ const AuthProvider = ({ children }: Props) => {
         username,
         email,
         password,
+        admin: username === 'Admin',
       })
       .then((res: { data: { user: SetStateAction<User | null> } }) => {
         console.log(res);

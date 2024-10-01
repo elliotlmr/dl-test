@@ -6,9 +6,13 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 
 config({ path: '.dev.vars' });
 
-const databaseUrl = drizzle(postgres(`${process.env.DATABASE_URL}`, 
+const databaseUrl = drizzle(
+  postgres(
+    `${process.env.PROD_DATABASE_URL}`,
 
-{ ssl: 'require', max: 1 }));
+    { ssl: 'require', max: 1 }
+  )
+);
 
 const main = async () => {
   try {

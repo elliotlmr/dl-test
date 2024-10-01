@@ -1,6 +1,4 @@
-import React, { ChangeEventHandler, useState } from 'react';
-import Visibility from '@/assets/vectors/visibility.svg';
-import VisibilityOff from '@/assets/vectors/visibility-off.svg';
+import React from 'react';
 import styles from './styles.module.scss';
 
 type Props = {
@@ -24,8 +22,6 @@ const Button = ({
   color = 'gold',
   custom,
 }: Props) => {
-  const [show, setShow] = useState(false);
-
   return (
     <button
       type={type}

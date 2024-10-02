@@ -73,5 +73,7 @@ pnpm dev
 ## Potential improvements
 
 - Add chatrooms between friends (relational table)
-- Add more custom fields on user table (profile picture, description, etc..)
-- Implement blacklist system
+- Add more custom fields on user table (profile picture, description, created_at, modified_at, etc..)
+- Allow user profile modifications
+- Implement blacklist system, firstname, lastname
+- Implement frontend for backoffice users pagination

@@ -40,25 +40,36 @@ users.post('/', async (c) => {
 
 //? Retrieve a list of all users
 users.get('/', async (c) => {
-  const sql = neon(c.env.DATABASE_URL);
-  const db = drizzle(sql);
+  try {
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
 
-  const users = await db
-    .select({
-      id: usersTable.id,
-      username: usersTable.username,
-      firstname: usersTable.firstname,
-      lastname: usersTable.lastname,
-      email: usersTable.email,
-      friends: usersTable.friends,
-      role: usersTable.role,
-    })
-    .from(usersTable);
+    const { size, page } = c.req.query();
 
-  if (users.length === 0) {
-    return c.json({ error: 'No doges in the park :(' }, 400);
+    const { password, ...safeData } = getTableColumns(usersTable);
+
+    const sizeNumber = size ? Number(size) : 1000000;
+
+    const pageNumber = page ? Number(page) : 1;
+
+    const pageOffset = (pageNumber - 1) * sizeNumber;
+
+    const users = await db
+      .select({ ...safeData })
+      .from(usersTable)
+      .orderBy(usersTable.username)
+      .limit(sizeNumber)
+      .offset(pageOffset);
+
+    if (users.length === 0) {
+      return c.json({ error: 'No doges in the park :(' }, 400);
+    }
+
+    return c.json({ users }, 200);
+  } catch (err) {
+    console.log(err);
+    c.json({ message: "Couldn't get users !", error: err }, 400);
   }
-  return c.json({ users }, 200);
 });
 
 //? Add a friend to a user's friend list
